@@ -34,16 +34,20 @@ It ships with one doctrine, **Never Touch The Original**. Every rule is a shell 
 Apple silicon, macOS 14 or later.
 
 <Steps>
-  <Step title="Open the disk image">
-    Drag **Mockingbird** onto Applications.
+  <Step title="Download it">
+    [mockingbird.marcobuhlmann.com](https://mockingbird.marcobuhlmann.com) — the button on that page serves the current build. The line beneath it reads the version, size and build straight from the published file, so what it says is what you get.
   </Step>
-  <Step title="Allow it the first time">
-    Builds are not notarized, so macOS refuses the first launch. Open **System Settings → Privacy & Security**, scroll down, and click **Open Anyway**.
+  <Step title="Open the disk image">
+    Drag **Mockingbird** onto Applications. It is signed with a Developer ID and notarized, so it opens on a double-click — no trip to System Settings, and no clicking past a warning.
   </Step>
   <Step title="Apply the guard fix">
     Open **Doctrine** and apply the fix beside *The T0 guard hook is installed*. Until you do, Mockingbird measures your Mac but enforces nothing.
   </Step>
 </Steps>
+
+<Note>
+  If you would rather check the file than trust the page: [`/download/latest.json`](https://mockingbird.marcobuhlmann.com/download/latest.json) carries the version, commit, byte count and SHA-256 of the image being served. `shasum -a 256 Mockingbird.dmg` should match it, and `spctl -a -t open --context context:primary-signature -v Mockingbird.dmg` should answer `source=Notarized Developer ID`.
+</Note>
 
 ### From source
 
@@ -55,7 +59,7 @@ Requires a Swift toolchain (Xcode 16 or later).
 swift build --package-path App   # debug build only
 ```
 
-The build stamps the repository into the bundle: the commit count as the build number, the short hash as the thing that identifies a build exactly. **Settings** shows both, along with whether the guard hook on disk matches the app that installed it.
+`make-dmg.sh` signs the app and the image with a Developer ID, submits them to Apple and staples the ticket, when a certificate is in the keychain; without one it still builds, and says so. The build stamps the repository into the bundle: the commit count as the build number, the short hash as the thing that identifies a build exactly. **Settings** shows both, along with whether the guard hook on disk matches the app that installed it.
 
 ### Headless use
 

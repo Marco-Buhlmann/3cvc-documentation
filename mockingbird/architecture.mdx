@@ -23,6 +23,7 @@ Entry.swift            argv switch — --scan / --context / --emit-fixes / --pro
   │     Roster.swift           every agent on this Mac and what it reaches
   │     Explain.swift          what the guard has blocked, and what each thing does
   │     Plain.swift            the plain-language strings Intuitive mode reads from
+  │     Licence.swift          trial, signed licence, and what either one entitles you to
   │
   ├── Engine/          what it does
   │     Shell.swift            bash runner with timeout, plus Paths and Store
@@ -31,6 +32,8 @@ Entry.swift            argv switch — --scan / --context / --emit-fixes / --pro
   │     Enforcement.swift      guard install/register/remove; FixRunner
   │     Approval.swift         the confirmation gate in front of anything that writes
   │     Context.swift          the allow-listed projection a copilot may see
+  │     Integrity.swift         whether this copy is the published build
+  │     UpdateCheck.swift       the one request that leaves: version in, link out
   │
   ├── Design/          Theme.swift — every hex in the app, one token each
   │                    Components.swift — the shared primitives

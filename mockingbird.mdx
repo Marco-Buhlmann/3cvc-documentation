@@ -45,6 +45,8 @@ Apple silicon, macOS 14 or later.
   </Step>
 </Steps>
 
+The first seven days are a trial with nothing held back — see [Trial and licence](#trial-and-licence) for what changes afterwards, and what does not.
+
 <Note>
   If you would rather check the file than trust the page: [`/download/latest.json`](https://mockingbird.marcobuhlmann.com/download/latest.json) carries the version, commit, byte count and SHA-256 of the image being served. `shasum -a 256 Mockingbird.dmg` should match it, and `spctl -a -t open --context context:primary-signature -v Mockingbird.dmg` should answer `source=Notarized Developer ID`.
 </Note>
@@ -94,6 +96,76 @@ dist/Mockingbird.app/Contents/MacOS/Mockingbird --version
 ```
 
 `--context` prints the allow-listed JSON a copilot may see, `--projection-script` prints the P2 narrowing without installing it, `--price-routine` writes the script that checks public price lists, `--prune-log` strips payloads from older audit entries, and `--restore-pack` resets built-in rules while keeping your custom ones. Run `--help` for the full list.
+
+## Trial and licence
+
+Mockingbird runs for **seven days** with nothing held back. After that it needs a licence.
+
+### What stops, and what does not
+
+When the trial ends the app keeps showing everything it has already measured — the score, every control and its evidence, the roster, the ledger — and stops being able to change anything on the Mac. Scans, fixes, rule edits, enforcement changes and cap changes are locked, and each refusal says what still works rather than failing quietly.
+
+<Note>
+  **The guard keeps enforcing.** The T0 guard is a hook on disk that Claude Code invokes directly. It keeps blocking exactly what it blocked yesterday whether or not this app is licensed, running, or even installed. Nothing on your Mac becomes less safe because a date passed.
+</Note>
+
+That is deliberate. An expired trial is a reason to lock an interface; it is not a reason to withdraw a control somebody has come to rely on.
+
+### Activating
+
+There is no activation server. A licence is a small signed file, checked against a key compiled into the app, so activation works offline and keeps working when nothing is reachable.
+
+<Steps>
+  <Step title="Find your machine code">
+    **Settings → Licence** shows a code like `BE6A-8F77-FE96`. It is a digest of this Mac's hardware identifier, not the identifier itself — a tool that reported machine identifiers in the clear would be the sort of thing this app exists to catch.
+  </Step>
+  <Step title="Ask for a licence">
+    Send that code to <a href="mailto:marco.buhlmann@gmail.com">marco.buhlmann@gmail.com</a>. Licences are issued by hand at the moment: there is no checkout, no account and no payment flow in the app.
+  </Step>
+  <Step title="Paste it in">
+    Paste the licence into **Settings → Licence** and click **Activate**. A licence that does not verify is refused and changes nothing, so a bad paste cannot displace one that works.
+  </Step>
+</Steps>
+
+A licence is normally bound to one Mac. One issued without a machine code runs anywhere, which is what a replacement machine gets.
+
+<Warning>
+  A licence cannot be revoked. There is no server to revoke it with — that is the same fact that makes activation work offline. Stopping a leaked licence means publishing a build with a different key, which invalidates every licence already issued.
+</Warning>
+
+### A modified copy cannot be activated
+
+macOS already refuses to launch a Developer ID build whose bundle has been edited, and nothing an app does about itself improves on that. What Mockingbird adds is narrower: re-signing a build with a different certificate is the ordinary way to get a modified one past Gatekeeper, and a copy signed by anyone other than the publisher will not accept a licence. It still runs, still measures, still shows everything it can see, and says plainly why it will not activate.
+
+If that check cannot run at all, the copy is treated as genuine. This layer must never be the reason somebody cannot use a licence they paid for.
+
+### From a shell
+
+```bash
+# State, and the machine code to quote
+Mockingbird --licence
+
+# Activate from a file
+Mockingbird --activate ~/Downloads/licence.json
+```
+
+Reading is never gated: `--scan`, `--roster`, `--ledger` and the rest keep working after the trial ends. `--preset`, which writes caps, does not, and exits 3 saying so.
+
+### Checking it
+
+`scripts/check-licence.sh` runs the shipping binary against a throwaway home directory — 30 checks covering the trial arithmetic, a clock wound backwards, a lost trial record, a forged payload, a licence issued for another Mac, an expired one, rubbish input, what an expired trial does and does not stop, and what a re-signed copy refuses.
+
+```bash
+scripts/check-licence.sh
+```
+
+The licences it uses are signed with the real key, so a break in the signing tool — or in the bytes either side signs over — shows up there rather than in somebody's first activation.
+
+## Updates
+
+Mockingbird asks the download site once per launch whether a newer build exists.
+
+That request is a GET for a static JSON file. It carries no licence, no machine code, no version and no identifier of any kind, and it downloads and installs nothing — it compares two version numbers and offers a link. It is a switch in **Settings**, and turning it off makes the app silent on the network again.
 
 ## The seven screens
 
@@ -173,12 +245,14 @@ Settings alone are not a real boundary on a single-user Mac. The one control Moc
 
 ## Storage
 
-Plain JSON, stored locally. Nothing leaves the machine.
+Plain JSON, stored locally. Nothing Mockingbird measures leaves the machine.
 
 ```text
 ~/Library/Application Support/Mockingbird/   rules · scans · events · drills · prefs · T0 baseline
                                              prices.json · ledger cache
 ~/.config/mockingbird/enforcement.json       read by the guard on every call
+~/.config/mockingbird/licence.json           your licence, if you have one
+~/.config/mockingbird/trial.json             when the trial started (a second copy sits in Application Support)
 ~/agent/work/mockingbird/                    prepared fix scripts
 ```
 

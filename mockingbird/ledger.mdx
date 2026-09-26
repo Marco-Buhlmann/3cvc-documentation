@@ -39,7 +39,7 @@ Published prices move, and a stale rate is worse than a missing one because it l
 dist/Mockingbird.app/Contents/MacOS/Mockingbird --price-routine
 ```
 
-The fetch lives in that routine, never in the app — which is what keeps the app's "no network calls" claim true. The routine proposes; you apply. It records when it last ran, and the app shows you the age of your rates so you can tell fresh numbers from old ones.
+The fetch lives in that routine, never in the app: the app has exactly one request of its own, and it is not this one. The routine proposes; you apply. It records when it last ran, and the app shows you the age of your rates so you can tell fresh numbers from old ones.
 
 ## The charts
 

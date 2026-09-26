@@ -4,7 +4,7 @@ description: "How a scan runs, how scoring and drift detection work, and how to 
 icon: "sitemap"
 ---
 
-Mockingbird is a single SwiftPM executable target, packaged into an `.app` bundle by `scripts/build-app.sh`. It has no dependencies, no `.xcodeproj` and makes no network calls.
+Mockingbird is a single SwiftPM executable target, packaged into an `.app` bundle by `scripts/build-app.sh`. It has no dependencies and no `.xcodeproj`. One request leaves the app — the update check in `Engine/UpdateCheck.swift`, a GET for a static file, off in one click.
 
 ```
 Entry.swift            argv switch — --scan / --context / --emit-fixes / --projection-script /

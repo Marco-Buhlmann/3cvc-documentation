@@ -31,14 +31,31 @@ It ships with one doctrine, **Never Touch The Original**. Every rule is a shell 
 
 ## Install
 
-Requires macOS 14 or later and a Swift toolchain (Xcode 16 or later).
+Apple silicon, macOS 14 or later.
+
+<Steps>
+  <Step title="Open the disk image">
+    Drag **Mockingbird** onto Applications.
+  </Step>
+  <Step title="Allow it the first time">
+    Builds are not notarized, so macOS refuses the first launch. Open **System Settings → Privacy & Security**, scroll down, and click **Open Anyway**.
+  </Step>
+  <Step title="Apply the guard fix">
+    Open **Doctrine** and apply the fix beside *The T0 guard hook is installed*. Until you do, Mockingbird measures your Mac but enforces nothing.
+  </Step>
+</Steps>
+
+### From source
+
+Requires a Swift toolchain (Xcode 16 or later).
 
 ```bash
-./scripts/build-app.sh
-open dist/Mockingbird.app
+./scripts/build-app.sh      # release build into dist/Mockingbird.app
+./scripts/make-dmg.sh       # and a disk image to hand to somebody
+swift build --package-path App   # debug build only
 ```
 
-The build script regenerates the icon, compiles a release build and assembles `dist/Mockingbird.app`. For a debug build only, run `swift build --package-path App`.
+The build stamps the repository into the bundle: the commit count as the build number, the short hash as the thing that identifies a build exactly. **Settings** shows both, along with whether the guard hook on disk matches the app that installed it.
 
 ### Headless use
 
@@ -61,7 +78,18 @@ dist/Mockingbird.app/Contents/MacOS/Mockingbird --roster
 dist/Mockingbird.app/Contents/MacOS/Mockingbird --explain-blocks
 ```
 
-`--context` prints the allow-listed JSON a copilot may see, `--projection-script` prints the P2 narrowing without installing it, `--price-routine` writes the script that checks public price lists, and `--restore-pack` resets built-in rules while keeping your custom ones. Run `--help` for the full list.
+```bash
+# Where the tokens went that did not need to
+dist/Mockingbird.app/Contents/MacOS/Mockingbird --usage --days 30
+
+# Set spending caps from this Mac's own usage, writing nothing
+dist/Mockingbird.app/Contents/MacOS/Mockingbird --preset everyday --dry-run
+
+# Which build this is, and the guard and doctrine it carries
+dist/Mockingbird.app/Contents/MacOS/Mockingbird --version
+```
+
+`--context` prints the allow-listed JSON a copilot may see, `--projection-script` prints the P2 narrowing without installing it, `--price-routine` writes the script that checks public price lists, `--prune-log` strips payloads from older audit entries, and `--restore-pack` resets built-in rules while keeping your custom ones. Run `--help` for the full list.
 
 ## The seven screens
 
@@ -112,6 +140,10 @@ The same data, twice.
 </CardGroup>
 
 Neither mode is a subset that hides a problem. The mode changes the vocabulary, not the score.
+
+**Settings → Open the app in** decides which one a new window starts in: whichever you used last, or always one of them. The switch at the bottom of the sidebar changes the mode you are in now.
+
+A control that is not holding is titled as the problem in Intuitive mode, not as the goal. "AI agents can't reset your privacy settings" beside a red mark reads as reassurance; "AI agents can reset your privacy settings" reads as what it is.
 
 ## Fixes are scripts, deliberately
 

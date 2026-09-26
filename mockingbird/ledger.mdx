@@ -57,6 +57,56 @@ dist/Mockingbird.app/Contents/MacOS/Mockingbird --ledger
 dist/Mockingbird.app/Contents/MacOS/Mockingbird --ledger --days 30
 ```
 
+## Where the tokens went that did not need to
+
+The ledger answers what your agents cost. The optimizer answers which of it was avoidable, from the same local transcripts.
+
+```bash
+Mockingbird --usage --days 30
+```
+
+Nine detectors, scored out of 100 and weighted the way the underlying research weights them — cache health 30, context hygiene 25, loops and fan-out 20, tools and connectors 15, reasoning 10.
+
+| | What it looks at |
+|---|---|
+| **Cache health** | The share of input served from cache, and the restarts and model switches that throw it away |
+| **Context hygiene** | Sessions carrying context past 150K, the same file read twice, instruction files nobody trims |
+| **Loops and fan-out** | Subagent runs and scheduled agents that spend while nobody is watching |
+| **Tools and connectors** | Single results large enough to dominate a session, connectors declared but never called |
+| **Reasoning** | Thinking as a share of output, billed at the output rate and never shown to you |
+
+Four of the estimates are measured rather than modelled, and each finding records **which meter its tokens sat on** — fresh input, output, or cache read. Carried context is a cache read at a tenth of fresh input; pricing it as fresh input overstates the waste tenfold, which is a mistake this app made once on real data.
+
+<Note>
+  The optimizer reads whole sessions that **ended** in the window; the ledger counts turns by the day they ran. Both are right, they answer different questions, and each figure says which it used. They will not add up to each other.
+</Note>
+
+### Right-sizing, not recommending
+
+It prices the traffic each model actually ran against the next model down, and says what the transcripts suggest about whether the work would survive the swap — a high thinking share is the worst candidate, heavy tool use the most plausible one. It never picks a model for you.
+
+## Caps
+
+The only part of the ledger that acts. Everything is off until you switch it on, and every limit is a number you set.
+
+| Cap | What it does |
+|---|---|
+| **Read hold** | A file whose size implies more than the threshold pauses before it is read whole, so it can be paged or searched instead |
+| **Session budget** | Stops to ask once a session has spent more than you allowed |
+| **Daily budget** | The same across every session, today |
+| **Unattended budget** | A tighter daily limit for work nobody started — decided by the process that launched the agent, not by whether the app is open |
+
+Four presets — off, careful, everyday, lean — size themselves from this Mac's own busy days rather than its median ones, and each states **how often it would have stopped you** over your recorded history. That number, not the token count, is what tells you whether a cap is livable.
+
+```bash
+Mockingbird --preset everyday --dry-run   # what it would set, writing nothing
+Mockingbird --preset off                  # clear every cap
+```
+
+<Warning>
+  A cap that trips pauses the call and asks in Mockingbird. With the app closed there is nobody to ask, so the call stops. Anything that goes wrong *inside* the caps layer lets the call through — thrift never blocks work by accident, while the doctrine layers stay fail-closed.
+</Warning>
+
 ## Checking it
 
 `scripts/check-ledger.py` checks the arithmetic against hand-computed costs — 22 checks, covering cache invalidation, re-pricing from `prices.json`, and the cache-write premium.

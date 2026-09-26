@@ -6,7 +6,13 @@ icon: "shield-halved"
 
 Mockingbird scores many things it doesn't control. The one thing it actually enforces is the P4 guard: a `PreToolUse` hook that checks every tool call before the call runs.
 
-Where the hook sits is the point. Permission rules live next to general-purpose interpreters. A deny rule next to a wildcard Python grant stops an honest agent, but not one that has been redirected. The guard reads the command string no matter which interpreter would run it.
+Where the hook sits is the point. Permission rules live next to general-purpose interpreters, and a deny rule next to a wildcard Python grant stops an honest agent but not a redirected one. The guard reads each command before it runs and blocks the ones that name a protected path.
+
+<Warning>
+  The guard reads the text of a command. It does not follow interpreters, resolve variables or decode anything, so a command that assembles a path at runtime can pass it. That is why N5 keeps general interpreters off the allow list: the guard is the second line, not the first.
+
+  It is also a Claude Code hook. Other agents on the same Mac — Codex, for example — run with nothing inspecting them, and the Agent Roster marks them **unguarded**.
+</Warning>
 
 ## Install
 
@@ -24,12 +30,26 @@ Registering *adds* the guard to `hooks.PreToolUse`. Your existing hooks keep the
 
 ## What it blocks
 
-| Category | Covers |
-|---|---|
-| T0 paths | The screenpipe capture store, the Messages and Mail stores, SSH key material, keychains, your photo library and your sealed documents directory |
-| Destructive commands | Recursive remove (`rm -rf`) · `DELETE FROM` · `DROP TABLE` · `--force` · the `tccutil` privacy reset |
+Four layers, each switchable on its own.
 
-The guard blocks a call by exiting with code 2. Every call is added to `~/agent/audit/tools.jsonl` with the current enforcement mode, so you can see afterwards what ran while the guard was paused.
+| Layer | Covers |
+|---|---|
+| T0 paths | The screen-capture store, the Messages and Mail stores, SSH key material, keychains, your photo library and your sealed-documents folder |
+| Destructive commands | Recursive remove (`rm -rf`) · `DELETE FROM` · `DROP TABLE` · `--force` · the `tccutil` privacy reset |
+| Mockingbird's own controls | The hook itself, `settings.json`, `~/.config/mockingbird/` and the audit folder. Reading them is allowed; changing them from a session is not |
+| Connectors | MCP calls to screen recorders, messaging bridges and mail bridges, matched by tool name |
+
+The last two exist because each was a way straight past the first two. An agent that can edit the hook can switch the guard off in one write, and a connector call is not a command at all, so the command checks never saw it.
+
+The guard blocks a call by exiting with code 2. Every call is recorded in `~/agent/audit/tools.jsonl`.
+
+<Note>
+  The log keeps metadata — time, tool, session, working directory, and the size of any content — never the content itself. Earlier versions wrote the whole payload, including the full text of every file written. If you are upgrading, `--prune-log` rewrites those old entries into the same shape; `--prune-log --drop` removes them instead.
+</Note>
+
+### A match found only in content
+
+If a protected path appears only inside the text of a file being written — not in the command, not in a path it names — the prompt says so and offers **Allow once** but not **Allow always**. A false alarm of that kind should not be able to open a standing exception.
 
 ## State
 
@@ -40,7 +60,9 @@ The guard reads `~/.config/mockingbird/enforcement.json` again on **every** call
   "mode": "active" | "paused" | "stopped",
   "until": "2026-09-04T22:00:00Z",   // a timed pause resumes by itself
   "guardT0": true,
-  "guardDestructive": true
+  "guardDestructive": true,
+  "guardSelf": true,        // Mockingbird's own files
+  "guardConnectors": true   // MCP calls that reach originals
 }
 ```
 

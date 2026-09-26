@@ -20,6 +20,31 @@ You can edit every rule in the app. The **Fix** column shows which rules can gen
   To write your own probe, see [Architecture](/mockingbird/architecture#probe-helpers) for the helper functions and exit codes.
 </Tip>
 
+## Three things a probe can say
+
+A probe reports holding, partial or open — and, since this version, **not applicable**.
+
+| Result | Means |
+|---|---|
+| Holding | The control is in place |
+| Partial | Something is there but does not cover the case |
+| Open | The control is missing |
+| Not applicable | The thing this control protects is not on this Mac |
+
+The last one matters more than it sounds. A Mac with no screen recorder, no sealed documents and no SSH keys used to collect red marks for data it did not have, which teaches people that red marks are noise. Paths that vary by machine — your sealed-documents folder — are settings, not assumptions baked into a rule.
+
+## Exceptions count against the score
+
+If you grant a standing exception, the rule it breaks stops reporting as holding. An exception naming the screen-history store fails that rule and leaves the rule about iMessage alone; one that cannot be tied to a particular store marks the layer's rules partial rather than failing any of them outright.
+
+The configuration being right is not the same as the machine being safe, and the score follows the machine.
+
+## The pack updates with the app
+
+`rules.json` is your copy of the built-in pack. When an update changes a probe, the copy is merged rather than replaced: untouched built-ins take the new version, **built-ins you edited stay edited** and are named in the log, custom rules carry across, and the previous file is backed up first.
+
+Nothing changes until you approve it — including Mockingbird's own updates.
+
 ## Invariants
 
 ### N1 — Never open a T0 store with a writable handle

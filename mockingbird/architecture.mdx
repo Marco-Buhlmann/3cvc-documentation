@@ -68,8 +68,11 @@ A `shell` rule's `check` is appended to `DefaultRules.prelude` and run with `/bi
 |---|---|
 | `0` | Holding |
 | `2` | Partial |
+| `3` | Not applicable — the thing this control protects is not on this Mac |
 | `124` | Unknown (timed out) |
 | anything else | Open |
+
+`mb_na` is the helper for the third one. A control for data you do not have is not a failure, and marking it one teaches people to ignore the failures that are real.
 
 The probe's stdout and stderr become the evidence shown in the app.
 
@@ -116,14 +119,37 @@ Mockingbird stores plain JSON under `~/Library/Application Support/Mockingbird/`
 | `scans.json` | The last 60 scans |
 | `events.json` | Drift, fixes, drills and enforcement changes |
 | `drills.json` | Recorded drill runs |
-| `prefs.json` | App preferences |
+| `prefs.json` | App preferences, including your sealed-documents folder and which mode opens |
 | `t0-baseline.txt` | The T0 baseline that movement is measured against |
+| `pack-fingerprint.json` | What the built-in pack looked like when it was last written |
+| `ledger-cache-v2.json` | Per-file token counts, so a finished session is parsed once |
+| `usage-cache-v2.json` | Per-file session profiles for the optimizer |
+| `prices.json` | Rates you added yourself, applied on read |
 
-Enforcement state is stored separately at `~/.config/mockingbird/enforcement.json`, because the guard reads it on every call.
+Three files live under `~/.config/mockingbird/` instead, because the guard reads them on every call and must not depend on the app running:
 
-<Warning>
-  The rule pack is written only once. Defaults go to `rules.json` on first launch, and Mockingbird never reads them from the app binary again. If you change a rule in Swift, existing installs won't see the change until you use **Settings → Restore built-in pack**.
-</Warning>
+| File | Contents |
+|---|---|
+| `enforcement.json` | Mode, and which guard layers are on |
+| `usage.json` | Your caps |
+| `overrides.json` | Exceptions you have granted, with their expiry |
+
+### Keeping the pack current
+
+`rules.json` is a copy of the built-in pack, and a copy can outlive the build that wrote it: a new probe ships, the old probe keeps running, and the app reports a posture measured by rules it no longer ships.
+
+The pack carries a fingerprint — every built-in rule's id, probe and fix script — recorded in `pack-fingerprint.json` alongside a per-rule digest. When the fingerprint moves, the pack merges:
+
+- a built-in whose digest still matches is replaced by the shipped version;
+- a built-in whose digest differs was **edited by hand**, so it is kept and named in the activity log;
+- custom rules carry across untouched;
+- the previous file is copied to `rules.json.premigration-<stamp>.bak` first.
+
+A pack that will not decode is a separate case. The built-ins have to take over for the app to run at all, but the file is copied to `rules.json.unreadable-<stamp>.bak` first and the log says where it went. Losing rules somebody wrote, quietly, is worse than any posture number being wrong.
+
+<Note>
+  **Settings → Restore built-in pack** still exists, for putting everything back to the doctrine as written. You no longer need it after an update.
+</Note>
 
 ## The projection scope
 

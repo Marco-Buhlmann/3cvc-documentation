@@ -65,7 +65,9 @@ The ledger answers what your agents cost. The optimizer answers which of it was 
 Mockingbird --usage --days 30
 ```
 
-Nine detectors, scored out of 100 and weighted the way the underlying research weights them — cache health 30, context hygiene 25, loops and fan-out 20, tools and connectors 15, reasoning 10.
+Nine detectors, scored out of 100 and weighted the way the underlying research weights them — cache health 30, context hygiene 25, loops and fan-out 20, tools and connectors 15, reasoning 10. The score starts at 100, each area subtracts at most the points it is worth, and only an area's worst finding counts, so one problem is never charged twice.
+
+The number is named as well as given: **85 and above** is efficient, **65–85** some waste, **40–65** wasteful, **under 40** very wasteful. The panel draws that scale and marks where you sit on it — a verdict with no boundaries behind it cannot be read, since 61 and 44 are both "wasteful" and one of them is nearly fine.
 
 | | What it looks at |
 |---|---|

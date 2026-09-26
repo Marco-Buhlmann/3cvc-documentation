@@ -30,6 +30,10 @@ The matrix answers "who can do X" by scanning a column. It does not answer "what
 
 Nerd Mode toggles between the two. Intuitive mode shows the map and keeps cards only for agents that carry a finding. Both read the same rows, and clicking any card opens the evidence behind each cell.
 
+<Note>
+  Every cell in the matrix carries a shape as well as a colour — granted `!`, denied `✓`, asks first a raised hand, declared `*`, not granted `−`, not visible `?`. Granted and denied were red and green, which is the one pair that collapses for the commonest colour blindness, and they are the two states the grid exists to tell apart. Hovering a cell names its state.
+</Note>
+
 Dashes travel from the hub outwards along each wire, in the direction the data goes. The motion carries a fact rather than decorating: a wire to an agent that can send data off your Mac is drawn brighter and thicker than one that only reads. If you have Reduce Motion turned on, the wires are drawn static.
 
 Past four agents, cards shrink to three capability lines and a "+n more". Ten are wired to the hub and the rest sit below — a smaller card still on the diagram beats a full-size one that fell off it.
@@ -89,6 +93,12 @@ Candidates have to look like a package name or they are discarded, since a comma
     Reporting "shell: denied" because a single narrow deny entry exists would read as though the agent cannot run commands, when it plainly can. A deny list shapes a capability. It rarely removes one.
   </Accordion>
 
+  <Accordion title="A connector is rarely one capability">
+    Most connectors worth worrying about do two things at once, and recording only one of them understates them. A messaging connector reads an original store **and** can send from it — that pairing is the combination §3 N2 exists to prevent, and it is invisible while the row says "network" alone. A cloud API connector is not holding one key inside the tool; it reads the credentials sitting on your Mac, which is a larger thing. A screen-control connector reads whatever is on screen and can click it, and no file permission covers either half.
+
+    A connector whose name still says nothing is reported as unclassified rather than assumed harmless. That has not changed: the roster would rather say it does not know.
+  </Accordion>
+
   <Accordion title="An entry naming a T0 path is about originals, however it is spelled">
     A read of the screen-history store is not a file permission. It is access to an original, and the roster files it that way regardless of which permission syntax expressed it.
   </Accordion>
@@ -106,7 +116,7 @@ It also catches what a file deny list cannot. A connector that reaches a T0 stor
 
 ## Checking it
 
-`scripts/check-roster.py` builds a home directory to order and asserts each cell and each finding — 35 checks.
+`scripts/check-roster.py` builds a home directory to order and asserts each cell and each finding — 44 checks.
 
 ```bash
 python3 scripts/check-roster.py

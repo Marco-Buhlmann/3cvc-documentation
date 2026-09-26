@@ -192,7 +192,7 @@ The generated script reads the schema in front of it and:
 
 An allow-list matters more than it looks. A deny-list only covers the apps you thought of, and browser-based banking and password pages are captured under the browser's own name — so an app-name deny-list never sees them.
 
-`scripts/check-projection.sh` runs all three scopes against a fixture on the current schema and asserts what survives: 43 checks, taking the narrowing from `--projection-script`, so the file the app installs and the file under test are the same file. `scripts/projection-narrow.example.py` is that output for the widest scope, kept in the repo so you can read the policy without running anything.
+`scripts/check-projection.sh` runs all three scopes against a fixture on the current schema and asserts what survives: 46 checks, taking the narrowing from `--projection-script`, so the file the app installs and the file under test are the same file. `scripts/projection-narrow.example.py` is that output for the widest scope, kept in the repo so you can read the policy without running anything.
 
 ## The two dashboards
 

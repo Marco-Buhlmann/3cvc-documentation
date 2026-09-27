@@ -36,7 +36,7 @@ The per-file cache holds token counts only. Prices are applied when the cache is
 Published prices move, and a stale rate is worse than a missing one because it looks right. `--price-routine` writes a script that checks the public price lists and proposes an update:
 
 ```bash
-dist/Mockingbird.app/Contents/MacOS/Mockingbird --price-routine
+dist/Mockingbyrd.app/Contents/MacOS/Mockingbyrd --price-routine
 ```
 
 The fetch lives in that routine, never in the app: the app has exactly one request of its own, and it is not this one. The routine proposes; you apply. It records when it last ran, and the app shows you the age of your rates so you can tell fresh numbers from old ones.
@@ -51,10 +51,10 @@ The tiles answer "the last 30 days" and the charts want your whole history, so t
 
 ```bash
 # Token use and API-equivalent spend, 90 days by default
-dist/Mockingbird.app/Contents/MacOS/Mockingbird --ledger
+dist/Mockingbyrd.app/Contents/MacOS/Mockingbyrd --ledger
 
 # A different window
-dist/Mockingbird.app/Contents/MacOS/Mockingbird --ledger --days 30
+dist/Mockingbyrd.app/Contents/MacOS/Mockingbyrd --ledger --days 30
 ```
 
 ## Where the tokens went that did not need to
@@ -62,7 +62,7 @@ dist/Mockingbird.app/Contents/MacOS/Mockingbird --ledger --days 30
 The ledger answers what your agents cost. The optimizer answers which of it was avoidable, from the same local transcripts.
 
 ```bash
-Mockingbird --usage --days 30
+Mockingbyrd --usage --days 30
 ```
 
 Nine detectors, scored out of 100 and weighted the way the underlying research weights them — cache health 30, context hygiene 25, loops and fan-out 20, tools and connectors 15, reasoning 10. The score starts at 100, each area subtracts at most the points it is worth, and only an area's worst finding counts, so one problem is never charged twice.
@@ -101,12 +101,12 @@ The only part of the ledger that acts. Everything is off until you switch it on,
 Four presets — off, careful, everyday, lean — size themselves from this Mac's own busy days rather than its median ones, and each states **how often it would have stopped you** over your recorded history. That number, not the token count, is what tells you whether a cap is livable.
 
 ```bash
-Mockingbird --preset everyday --dry-run   # what it would set, writing nothing
-Mockingbird --preset off                  # clear every cap
+Mockingbyrd --preset everyday --dry-run   # what it would set, writing nothing
+Mockingbyrd --preset off                  # clear every cap
 ```
 
 <Warning>
-  A cap that trips pauses the call and asks in Mockingbird. With the app closed there is nobody to ask, so the call stops. Anything that goes wrong *inside* the caps layer lets the call through — thrift never blocks work by accident, while the doctrine layers stay fail-closed.
+  A cap that trips pauses the call and asks in Mockingbyrd. With the app closed there is nobody to ask, so the call stops. Anything that goes wrong *inside* the caps layer lets the call through — thrift never blocks work by accident, while the doctrine layers stay fail-closed.
 </Warning>
 
 ## Checking it

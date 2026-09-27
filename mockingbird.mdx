@@ -1,5 +1,5 @@
 ---
-title: "Mockingbird"
+title: "Mockingbyrd"
 icon:
   name: "bird"
   style: "regular"
@@ -8,12 +8,12 @@ description: "Checks, fixes and enforcement for one OPSEC doctrine on one Mac."
 sidebarTitle: "Overview"
 ---
 
-Mockingbird is a native macOS app. It checks your Mac against an operating doctrine, sets up the controls the doctrine calls for, and tells you when one of them stops working. You can pause or stop enforcement at any time without uninstalling it.
+Mockingbyrd is a native macOS app. It checks your Mac against an operating doctrine, sets up the controls the doctrine calls for, and tells you when one of them stops working. You can pause or stop enforcement at any time without uninstalling it.
 
 It ships with one doctrine, **Never Touch The Original**. Every rule is a shell probe you can edit, so the score follows whatever rule pack you load.
 
 <Note>
-  Everything Mockingbird measures stays on your Mac, stored as plain JSON you can read. It makes exactly one request of its own — an update check, which fetches a static file from the download site to compare version numbers and can be switched off in Settings. It carries no identifier, and nothing it measures is ever sent anywhere.
+  Everything Mockingbyrd measures stays on your Mac, stored as plain JSON you can read. It makes exactly one request of its own — an update check, which fetches a static file from the download site to compare version numbers and can be switched off in Settings. It carries no identifier, and nothing it measures is ever sent anywhere.
 </Note>
 
 ## What it does
@@ -22,12 +22,12 @@ It ships with one doctrine, **Never Touch The Original**. Every rule is a shell 
 | --- | --- |
 | **Measures** | 58 probes, one for each checkable claim in the doctrine's invariants (N1–N7) and phases (P0–P5). Each one runs live and reports the evidence it found. |
 | **Scores** | Weighted by severity: critical 10, high 6, medium 3, low 1. A partial result earns half credit. You get an overall percentage plus a score for each invariant and phase. |
-| **Implements** | If a rule has a safe fix, Mockingbird writes it out as a shell script. You read the script, then apply it or run it yourself. Settings are backed up first. |
+| **Implements** | If a rule has a safe fix, Mockingbyrd writes it out as a shell script. You read the script, then apply it or run it yourself. Settings are backed up first. |
 | **Adjusts** | You can edit every probe, weight and on/off setting in the app, and your changes are saved. You can also add your own rules. |
 | **Monitors** | Scans again on a schedule and records regressions, config changes, allow-list changes and movement in T0 stores. |
 | **Inventories** | Reads every agent on your Mac — its config, its entitlements, what macOS actually granted it, and what is running right now — and draws what each one can reach. |
 | **Accounts** | Rebuilds token use and API-equivalent spend per model, project and week from session files already on your Mac. |
-| **Pauses and stops** | The guard reads Mockingbird's state file on every call, so pausing or stopping works right away. |
+| **Pauses and stops** | The guard reads Mockingbyrd's state file on every call, so pausing or stopping works right away. |
 
 ## Install
 
@@ -38,17 +38,17 @@ Apple silicon, macOS 14 or later.
     [mockingbird.marcobuhlmann.com](https://mockingbird.marcobuhlmann.com) — the button on that page serves the current build. The line beneath it reads the version, size and build straight from the published file, so what it says is what you get.
   </Step>
   <Step title="Open the disk image">
-    Drag **Mockingbird** onto Applications. It is signed with a Developer ID and notarized, so it opens on a double-click — no trip to System Settings, and no clicking past a warning.
+    Drag **Mockingbyrd** onto Applications. It is signed with a Developer ID and notarized, so it opens on a double-click — no trip to System Settings, and no clicking past a warning.
   </Step>
   <Step title="Apply the guard fix">
-    Open **Doctrine** and apply the fix beside *The T0 guard hook is installed*. Until you do, Mockingbird measures your Mac but enforces nothing.
+    Open **Doctrine** and apply the fix beside *The T0 guard hook is installed*. Until you do, Mockingbyrd measures your Mac but enforces nothing.
   </Step>
 </Steps>
 
 The first seven days are a trial with nothing held back — see [Trial and licence](#trial-and-licence) for what changes afterwards, and what does not.
 
 <Note>
-  If you would rather check the file than trust the page: [`/download/latest.json`](https://mockingbird.marcobuhlmann.com/download/latest.json) carries the version, commit, byte count and SHA-256 of the image being served. `shasum -a 256 Mockingbird.dmg` should match it, and `spctl -a -t open --context context:primary-signature -v Mockingbird.dmg` should answer `source=Notarized Developer ID`.
+  If you would rather check the file than trust the page: [`/download/latest.json`](https://mockingbird.marcobuhlmann.com/download/latest.json) carries the version, commit, byte count and SHA-256 of the image being served. `shasum -a 256 Mockingbyrd.dmg` should match it, and `spctl -a -t open --context context:primary-signature -v Mockingbyrd.dmg` should answer `source=Notarized Developer ID`.
 </Note>
 
 ### From source
@@ -56,7 +56,7 @@ The first seven days are a trial with nothing held back — see [Trial and licen
 Requires a Swift toolchain (Xcode 16 or later).
 
 ```bash
-./scripts/build-app.sh      # release build into dist/Mockingbird.app
+./scripts/build-app.sh      # release build into dist/Mockingbyrd.app
 ./scripts/make-dmg.sh       # and a disk image to hand to somebody
 swift build --package-path App   # debug build only
 ```
@@ -65,41 +65,41 @@ swift build --package-path App   # debug build only
 
 ### Headless use
 
-You can run Mockingbird from a shell or a cron job:
+You can run Mockingbyrd from a shell or a cron job:
 
 ```bash
 # Run every probe and print its evidence
-dist/Mockingbird.app/Contents/MacOS/Mockingbird --scan --verbose
+dist/Mockingbyrd.app/Contents/MacOS/Mockingbyrd --scan --verbose
 
 # Write every fix script without changing anything
-dist/Mockingbird.app/Contents/MacOS/Mockingbird --emit-fixes DIR
+dist/Mockingbyrd.app/Contents/MacOS/Mockingbyrd --emit-fixes DIR
 
 # Token use and API-equivalent spend
-dist/Mockingbird.app/Contents/MacOS/Mockingbird --ledger --days 90
+dist/Mockingbyrd.app/Contents/MacOS/Mockingbyrd --ledger --days 90
 
 # Every agent on this Mac, and what it reaches
-dist/Mockingbird.app/Contents/MacOS/Mockingbird --roster
+dist/Mockingbyrd.app/Contents/MacOS/Mockingbyrd --roster
 
 # What the guard has blocked, and what each thing does
-dist/Mockingbird.app/Contents/MacOS/Mockingbird --explain-blocks
+dist/Mockingbyrd.app/Contents/MacOS/Mockingbyrd --explain-blocks
 ```
 
 ```bash
 # Where the tokens went that did not need to
-dist/Mockingbird.app/Contents/MacOS/Mockingbird --usage --days 30
+dist/Mockingbyrd.app/Contents/MacOS/Mockingbyrd --usage --days 30
 
 # Set spending caps from this Mac's own usage, writing nothing
-dist/Mockingbird.app/Contents/MacOS/Mockingbird --preset everyday --dry-run
+dist/Mockingbyrd.app/Contents/MacOS/Mockingbyrd --preset everyday --dry-run
 
 # Which build this is, and the guard and doctrine it carries
-dist/Mockingbird.app/Contents/MacOS/Mockingbird --version
+dist/Mockingbyrd.app/Contents/MacOS/Mockingbyrd --version
 ```
 
 `--context` prints the allow-listed JSON a copilot may see, `--projection-script` prints the P2 narrowing without installing it, `--price-routine` writes the script that checks public price lists, `--prune-log` strips payloads from older audit entries, and `--restore-pack` resets built-in rules while keeping your custom ones. Run `--help` for the full list.
 
 ## Trial and licence
 
-Mockingbird runs for **seven days** with nothing held back. After that it needs a licence.
+Mockingbyrd runs for **seven days** with nothing held back. After that it needs a licence.
 
 ### What stops, and what does not
 
@@ -137,7 +137,7 @@ A licence is normally bound to one Mac. One issued without a machine code runs a
 
 ### A modified copy cannot be activated
 
-macOS already refuses to launch a Developer ID build whose bundle has been edited, and nothing an app does about itself improves on that. What Mockingbird adds is narrower: re-signing a build with a different certificate is the ordinary way to get a modified one past Gatekeeper, and a copy signed by anyone other than the publisher will not accept a licence. It still runs, still measures, still shows everything it can see, and says plainly why it will not activate.
+macOS already refuses to launch a Developer ID build whose bundle has been edited, and nothing an app does about itself improves on that. What Mockingbyrd adds is narrower: re-signing a build with a different certificate is the ordinary way to get a modified one past Gatekeeper, and a copy signed by anyone other than the publisher will not accept a licence. It still runs, still measures, still shows everything it can see, and says plainly why it will not activate.
 
 If that check cannot run at all, the copy is treated as genuine. This layer must never be the reason somebody cannot use a licence they paid for.
 
@@ -145,10 +145,10 @@ If that check cannot run at all, the copy is treated as genuine. This layer must
 
 ```bash
 # State, and the machine code to quote
-Mockingbird --licence
+Mockingbyrd --licence
 
 # Activate from a file
-Mockingbird --activate ~/Downloads/licence.json
+Mockingbyrd --activate ~/Downloads/licence.json
 ```
 
 Reading is never gated: `--scan`, `--roster`, `--ledger` and the rest keep working after the trial ends. `--preset`, which writes caps, does not, and exits 3 saying so.
@@ -165,7 +165,7 @@ The licences it uses are signed with the real key, so a break in the signing too
 
 ## Updates
 
-Mockingbird asks the download site once per launch whether a newer build exists.
+Mockingbyrd asks the download site once per launch whether a newer build exists.
 
 That request is a GET for a static JSON file. It carries no licence, no machine code, no version and no identifier of any kind, and it downloads and installs nothing — it compares two version numbers and offers a link. It is a switch in **Settings**, and turning it off makes the app silent on the network again.
 
@@ -175,7 +175,7 @@ Grouped in the sidebar as **Posture**, **Control** and **Spend**.
 
 <CardGroup cols={2}>
   <Card title="Overview" icon="gauge">
-    Coverage, then **Start here** — the three controls worth doing next, each marked whether Mockingbird can apply it or it needs you. Below that the doctrine's sections in order: §0's numbers measured live, §2's direction of travel, N1–N7 and P0–P5 at a glance, and every open finding ranked by what it costs.
+    Coverage, then **Start here** — the three controls worth doing next, each marked whether Mockingbyrd can apply it or it needs you. Below that the doctrine's sections in order: §0's numbers measured live, §2's direction of travel, N1–N7 and P0–P5 at a glance, and every open finding ranked by what it costs.
   </Card>
 
   <Card title="Doctrine" icon="list-check">
@@ -225,7 +225,7 @@ A control that is not holding is titled as the problem in Intuitive mode, not as
 
 ## Fixes are scripts, deliberately
 
-The doctrine's N3 says an agent's output is only a proposal, and you are the one who applies it. Mockingbird follows the same rule:
+The doctrine's N3 says an agent's output is only a proposal, and you are the one who applies it. Mockingbyrd follows the same rule:
 
 <Steps>
   <Step title="Prepare script">
@@ -240,14 +240,14 @@ Fixes are only as aggressive as the doctrine. Removing grants that override the 
 
 ## Enforcement in one paragraph
 
-Settings alone are not a real boundary on a single-user Mac. The one control Mockingbird actually holds is a `PreToolUse` hook at `~/.claude/hooks/t0-guard`. It checks each tool call for T0 paths and destructive commands like `rm -rf`, `DELETE FROM`, `DROP TABLE` and `--force`, no matter which interpreter would run them. It reads the command and the paths the call touches, not the file contents the call carries. Registering the guard adds it alongside your existing hooks. The guard reads `~/.config/mockingbird/enforcement.json` on every call, so pausing works right away and a timed pause ends by itself.
+Settings alone are not a real boundary on a single-user Mac. The one control Mockingbyrd actually holds is a `PreToolUse` hook at `~/.claude/hooks/t0-guard`. It checks each tool call for T0 paths and destructive commands like `rm -rf`, `DELETE FROM`, `DROP TABLE` and `--force`, no matter which interpreter would run them. It reads the command and the paths the call touches, not the file contents the call carries. Registering the guard adds it alongside your existing hooks. The guard reads `~/.config/mockingbird/enforcement.json` on every call, so pausing works right away and a timed pause ends by itself.
 
 <Card title="Read the enforcement guide" icon="shield-halved" horizontal href="/mockingbird/enforcement">
 </Card>
 
 ## Storage
 
-Plain JSON, stored locally. Nothing Mockingbird measures leaves the machine.
+Plain JSON, stored locally. Nothing Mockingbyrd measures leaves the machine.
 
 ```text
 ~/Library/Application Support/Mockingbird/   rules · scans · events · drills · prefs · T0 baseline
@@ -260,17 +260,17 @@ Plain JSON, stored locally. Nothing Mockingbird measures leaves the machine.
 
 The ledger reads `~/.claude/projects` and `~/.codex/sessions` and writes nothing back to either. Its cache holds token counts only, keyed by file size and modification time — prices are applied on read, so editing `prices.json` re-prices your history immediately.
 
-The rule pack is written once, on first launch, and Mockingbird never reads it from the app binary again. That way your edits survive upgrades. To pick up new built-in rules after an update, use **Settings → Restore built-in pack**. Your custom rules are kept.
+The rule pack is written once, on first launch, and Mockingbyrd never reads it from the app binary again. That way your edits survive upgrades. To pick up new built-in rules after an update, use **Settings → Restore built-in pack**. Your custom rules are kept.
 
 ## Limits
 
 <Warning>
-  Mockingbird does not isolate anything.
+  Mockingbyrd does not isolate anything.
 </Warning>
 
-Mockingbird runs as your user. An agent with a general-purpose interpreter can reach anything your user can reach, including this app. What the controls buy you is that a mistake takes more separate steps, and you can see each one. That lowers the risk, but it is not a boundary. For a real boundary, use a second macOS user account that owns `~/agent/`, or a virtual machine.
+Mockingbyrd runs as your user. An agent with a general-purpose interpreter can reach anything your user can reach, including this app. What the controls buy you is that a mistake takes more separate steps, and you can see each one. That lowers the risk, but it is not a boundary. For a real boundary, use a second macOS user account that owns `~/agent/`, or a virtual machine.
 
-Mockingbird also can't stop context from leaving your Mac. Anything an agent reads is sent to a model provider. Narrowing the screenpipe projection (P2) is the only control here that affects that, so take it seriously.
+Mockingbyrd also can't stop context from leaving your Mac. Anything an agent reads is sent to a model provider. Narrowing the screenpipe projection (P2) is the only control here that affects that, so take it seriously.
 
 ## Next steps
 

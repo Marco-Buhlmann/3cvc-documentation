@@ -4,12 +4,12 @@ description: "How a scan runs, how scoring and drift detection work, and how to 
 icon: "sitemap"
 ---
 
-Mockingbird is a single SwiftPM executable target, packaged into an `.app` bundle by `scripts/build-app.sh`. It has no dependencies and no `.xcodeproj`. One request leaves the app — the update check in `Engine/UpdateCheck.swift`, a GET for a static file, off in one click.
+Mockingbyrd is a single SwiftPM executable target, packaged into an `.app` bundle by `scripts/build-app.sh`. It has no dependencies and no `.xcodeproj`. One request leaves the app — the update check in `Engine/UpdateCheck.swift`, a GET for a static file, off in one click.
 
 ```
 Entry.swift            argv switch — --scan / --context / --emit-fixes / --projection-script /
                        --ledger / --roster / --price-routine / --explain-blocks /
-                       --restore-pack / --help, else MockingbirdApp.main()
+                       --restore-pack / --help, else MockingbyrdApp.main()
   │
   ├── Model/           what a control is
   │     Rule.swift             Rule, Section, Tier, Severity, CheckResult, Scan, Posture,
@@ -114,7 +114,7 @@ The `p2.t0-movement-attributable` rule goes further. It uses `lsof` to check whe
 
 ## Persistence
 
-Mockingbird stores plain JSON under `~/Library/Application Support/Mockingbird/`:
+Mockingbyrd stores plain JSON under `~/Library/Application Support/Mockingbird/`:
 
 | File | Contents |
 |---|---|
@@ -234,7 +234,7 @@ Intuitive mode is the one place decoration spends a status colour: navigation ti
 ## Build
 
 ```bash
-./scripts/build-app.sh          # regenerate the icon, compile a release build, assemble dist/Mockingbird.app
+./scripts/build-app.sh          # regenerate the icon, compile a release build, assemble dist/Mockingbyrd.app
 swift build --package-path App  # debug build only
 ```
 

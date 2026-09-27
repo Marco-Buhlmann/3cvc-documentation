@@ -4,7 +4,7 @@ description: "The PreToolUse guard: installing it, what it blocks, pausing and s
 icon: "shield-halved"
 ---
 
-Mockingbird scores many things it doesn't control. The one thing it actually enforces is the P4 guard: a `PreToolUse` hook that checks every tool call before the call runs.
+Mockingbyrd scores many things it doesn't control. The one thing it actually enforces is the P4 guard: a `PreToolUse` hook that checks every tool call before the call runs.
 
 Where the hook sits is the point. Permission rules live next to general-purpose interpreters, and a deny rule next to a wildcard Python grant stops an honest agent but not a redirected one. The guard reads each command before it runs and blocks the ones that name a protected path.
 
@@ -21,7 +21,7 @@ In the app, open **Enforcement**, click **Install / update guard**, then click *
 Or from a shell:
 
 ```bash
-dist/Mockingbird.app/Contents/MacOS/Mockingbird --emit-fixes ~/agent/work/mockingbird
+dist/Mockingbyrd.app/Contents/MacOS/Mockingbyrd --emit-fixes ~/agent/work/mockingbird
 bash ~/agent/work/mockingbird/_guard-install.sh
 bash ~/agent/work/mockingbird/_guard-register.sh
 ```
@@ -36,7 +36,7 @@ Four layers, each switchable on its own.
 |---|---|
 | T0 paths | The screen-capture store, the Messages and Mail stores, SSH key material, keychains, your photo library and your sealed-documents folder |
 | Destructive commands | Recursive remove (`rm -rf`) · `DELETE FROM` · `DROP TABLE` · `--force` · the `tccutil` privacy reset |
-| Mockingbird's own controls | The hook itself, `settings.json`, `~/.config/mockingbird/` and the audit folder. Reading them is allowed; changing them from a session is not |
+| Mockingbyrd's own controls | The hook itself, `settings.json`, `~/.config/mockingbird/` and the audit folder. Reading them is allowed; changing them from a session is not |
 | Connectors | MCP calls to screen recorders, messaging bridges and mail bridges, matched by tool name |
 
 The last two exist because each was a way straight past the first two. An agent that can edit the hook can switch the guard off in one write, and a connector call is not a command at all, so the command checks never saw it.
@@ -61,7 +61,7 @@ The guard reads `~/.config/mockingbird/enforcement.json` again on **every** call
   "until": "2026-09-04T22:00:00Z",   // a timed pause resumes by itself
   "guardT0": true,
   "guardDestructive": true,
-  "guardSelf": true,        // Mockingbird's own files
+  "guardSelf": true,        // Mockingbyrd's own files
   "guardConnectors": true   // MCP calls that reach originals
 }
 ```
@@ -121,4 +121,4 @@ Four rules re-run cases from this table on every scan: the two blocks, the prose
 
 ## Remove the guard
 
-Click **Remove** in the Enforcement tab, or run `_guard-uninstall.sh`. This unregisters the hook and renames the script to `t0-guard.removed-<timestamp>` instead of deleting it. The doctrine's N6, never delegate deletion, applies to Mockingbird too.
+Click **Remove** in the Enforcement tab, or run `_guard-uninstall.sh`. This unregisters the hook and renames the script to `t0-guard.removed-<timestamp>` instead of deleting it. The doctrine's N6, never delegate deletion, applies to Mockingbyrd too.

@@ -52,7 +52,7 @@ A tool's own config is what that tool chose to write about itself. The roster re
   </Step>
 
   <Step title="TCC">
-    What macOS actually allowed. Mockingbird opens the TCC databases read-only and immutable, so no journal is written beside a system database.
+    What macOS actually allowed. Mockingbyrd opens the TCC databases read-only and immutable, so no journal is written beside a system database.
   </Step>
 </Steps>
 
@@ -63,10 +63,10 @@ That is also why entitlements get their own state, **declared, not confirmed**, 
 ### Reading TCC needs Full Disk Access
 
 <Warning>
-  To report who else holds a broad read on your Mac, Mockingbird has to hold one itself.
+  To report who else holds a broad read on your Mac, Mockingbyrd has to hold one itself.
 </Warning>
 
-This is a genuine trade, and the app states it in the interface rather than burying it. Mockingbird asks for nothing on its own. Without the grant it says so plainly, keeps every row at "declared, not confirmed", and offers a button that opens the right settings pane.
+This is a genuine trade, and the app states it in the interface rather than burying it. Mockingbyrd asks for nothing on its own. Without the grant it says so plainly, keeps every row at "declared, not confirmed", and offers a button that opens the right settings pane.
 
 Granting it stays your act, because macOS does not let an app grant itself this. That is the point, not a limitation.
 
@@ -77,7 +77,7 @@ A row named *Analyst* tells you nothing on its own. Every row carries the tool i
 Agents and connectors are counted apart, too. Two agents with eight plug-ins is not ten peers.
 
 <Warning>
-  **Unguarded rows.** Mockingbird's guard is a Claude Code hook. An agent it cannot watch — Codex, for example — is described from its configuration, never from observation, and carries an **unguarded** mark. Without it, the agent nothing inspects shows fewer marks than the one that is inspected, and so reads as the safer of the two. It is not.
+  **Unguarded rows.** Mockingbyrd's guard is a Claude Code hook. An agent it cannot watch — Codex, for example — is described from its configuration, never from observation, and carries an **unguarded** mark. Without it, the agent nothing inspects shows fewer marks than the one that is inspected, and so reads as the safer of the two. It is not.
 </Warning>
 
 ## Declared versus running
@@ -125,7 +125,7 @@ python3 scripts/check-roster.py
 Headless, the roster prints to a shell:
 
 ```bash
-dist/Mockingbird.app/Contents/MacOS/Mockingbird --roster
+dist/Mockingbyrd.app/Contents/MacOS/Mockingbyrd --roster
 ```
 
 <Card title="Back to architecture" icon="sitemap" horizontal href="/mockingbird/architecture">

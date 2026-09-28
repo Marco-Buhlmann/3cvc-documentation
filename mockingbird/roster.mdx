@@ -6,7 +6,7 @@ icon: "diagram-project"
 
 The roster answers one question: who can reach what.
 
-Rows are the things that can act — the agents themselves, the profiles and subagent definitions they run under, scheduled jobs, connectors, and apps that are not agents but declare reach into the same stores. Columns are the capabilities the doctrine cares about: files, shell, code runners, network, delete, secrets, originals and connectors.
+Rows are the things that can act — the agents themselves, the profiles and subagent definitions they run under, scheduled jobs, connectors, and installed applications that declare reach into the same stores — including the ones that turn out to be assistants in their own right. Columns are the capabilities the doctrine cares about: files, shell, code runners, network, delete, secrets, originals and connectors.
 
 <Note>
   The roster reads what is already on your Mac. It sends nothing anywhere, and it changes nothing it reads.
@@ -36,7 +36,7 @@ Nerd Mode toggles between the two. Intuitive mode shows the map and keeps cards 
 
 Dashes travel from the hub outwards along each wire, in the direction the data goes. The motion carries a fact rather than decorating: a wire to an agent that can send data off your Mac is drawn brighter and thicker than one that only reads. If you have Reduce Motion turned on, the wires are drawn static.
 
-Past four agents, cards shrink to three capability lines and a "+n more". Ten are wired to the hub and the rest sit below — a smaller card still on the diagram beats a full-size one that fell off it.
+Past four agents, cards shrink to three capability lines and a "+n more". Cards sit three to a row, and the hub holds a cell of its own in the middle of the grid rather than floating in a gap beside it. Sixteen are wired, chosen by how far each row reaches rather than by the order the roster happened to build them in; anything beyond that sits below with no wire drawn. A card can never grow into the row beneath it — it truncates instead.
 
 ## Where each cell comes from
 
@@ -70,61 +70,121 @@ This is a genuine trade, and the app states it in the interface rather than bury
 
 Granting it stays your act, because macOS does not let an app grant itself this. That is the point, not a limitation.
 
-## Apps that are not agents
+## Apps that are not Claude, Codex or Cursor
 
 The roster used to recognise four process names — Claude, Codex, ChatGPT, Cursor — so an AI
 app called anything else was invisible however much it could reach. A tool running right now,
 declaring access to your contacts, calendars, photos and reminders, appeared nowhere.
 
-Every running app outside `/System` is read now, and one gets a row — in the panel under the
-map, in the matrix, and in Intuitive mode's summary card — when its code signature declares an
-**original store or the keychain**. The test is reach, not vendor: the question
-this page answers is what can get at your things, and an app saying so in its own signature is
-as good a source as a config file.
+Every running app outside `/System` is read now, and one gets a row when its code signature
+declares an **original store or the keychain**. The test is reach, not vendor: the question this
+page answers is what can get at your things, and an app saying so in its own signature is as
+good a source as a config file.
 
 Sensors alone are not enough. Location and the camera are declared by half the Mac, and a row
 for each would bury the rows that matter.
 
 <Tip>
-  The list is usually more surprising than expected, and rarely in the direction people brace
-  for. On a typical Mac the widest declared reach belongs to office and PDF software — files,
-  network, contacts, calendars, keychain and Apple Events, which is the read-and-send pairing
-  §3 N2 exists to prevent — rather than to anything with "AI" in its name.
+  The list is usually more surprising than expected. Office and PDF software declares a great
+  deal — files, network, contacts, calendars, keychain and Apple Events, which is the
+  read-and-send pairing §3 N2 exists to prevent. But a long list of declarations is a sign of
+  being *sandboxed*, not of reaching furthest. The apps that declare least are often the ones
+  that reach most, for the reason two sections down.
 </Tip>
 
 <Note>
-  These rows are **declared, never granted** — the same state entitlements get everywhere else
-  here. What macOS actually allowed is in TCC, which needs Full Disk Access to read.
+  A TCC-gated entitlement on these rows is **declared, never granted** — the same state
+  entitlements get everywhere else here. What macOS actually allowed is in TCC, which needs Full
+  Disk Access to read. The sandbox is the one exception, and it runs the other way; see below.
 </Note>
 
-Three things keep them from being mistaken for agents:
+### Three kinds, read from the app's own words
+
+Filing every installed application under one word flattened a difference that matters. A video
+editor that may read your contacts to fill in a credit is not making the same statement as an
+assistant that reads all four original stores and says outright that it can send your mail.
+
+The verdict comes from each bundle's `NS*UsageDescription` strings — the sentences Apple
+requires a vendor to write and shows you verbatim in the permission dialogue. They are the
+vendor's own account of why they want a thing, and you have already been shown them once.
+
+| Kind | What it is | The sentence that said so |
+|---|---|---|
+| **Assistant** | Reads on its own initiative and can act for you | *"…reads and updates your contacts so the assistant can look up and manage the people you know"* |
+| **Host** | Declares this reach for whatever you run inside it | *"An application in iTerm2 wants to use the photo library."* |
+| **App** | A feature of the app; the data stays inside it | *"You can import your media directly into iMovie from Photos."* |
+
+A host attributes the ask to something other than itself. An assistant is itself the actor.
+Where a bundle claims both — a terminal that also has an assistant in it — **host wins**,
+because *anything I run may reach this* is the larger of the two claims.
+
+A host is worth its own kind because its reach is not really its own: it belongs to whatever
+runs inside it. The T0 guard lives in one of these.
+
+<Tip>
+  There is no list of vendor names anywhere in this. A name list is wrong the day after it is
+  written and says nothing at all about an app nobody has heard of. The deciding sentence is
+  quoted on the row, so a verdict you disagree with shows its reasoning rather than asserting
+  itself.
+</Tip>
+
+Three things keep them from being mistaken for the agents you configured:
 
 <AccordionGroup>
   <Accordion title="Counted apart">
-    The hub reads "2 agents · 8 connectors · 17 apps". An app that declares reach is not an
-    agent and not a plug-in, and folding it into either number would overstate that number.
+    The hub reads something like "3 agents · 8 connectors · 1 assistant · 2 hosts · 15 apps",
+    with the numbers measured on your own Mac. An installed assistant is counted on its own rather than folded into either neighbour. It is not an agent
+    in the roster's sense — nothing here configured it, and the guard cannot see it — but
+    counting it as "an app" beside a PDF reader was the thing this number got wrong.
   </Accordion>
 
-  <Accordion title="Kept off the map, but not out of sight">
-    The map is about agents and the wires between them, and a dozen or more cards with no
-    wires would bury the two that have them. So apps are not drawn on the diagram — they get
-    their own panel beneath it, sorted by how far each signature says the app reaches, with
-    the capability tags on every row. They also appear in the matrix, and in Intuitive mode as
-    a single card naming them all.
+  <Accordion title="On the map, or in the panel beneath it">
+    Assistants and hosts are wired to the hub, because an app that reads every original store on
+    the machine is exactly what a picture of "what can reach this Mac" is for. Plain apps are not
+    drawn — a dozen or more cards with no wires would bury the ones that have them — so they
+    get their own panel below, sorted by reach, with the capability tags on every row. Everything
+    appears in the matrix either way, and in Intuitive mode as a card that names the assistants
+    first and separately.
 
-    The first version of this counted them in the hub and showed them nowhere, which made a
-    working feature look broken: the diagram said "17 apps" and offered no way to see which
-    seventeen.
+    An earlier version counted apps in the hub and showed them nowhere, which made a working
+    feature look broken: the diagram said "17 apps" and offered no way to see which seventeen.
   </Accordion>
 
   <Accordion title="Unguarded, and said so">
-    The T0 guard is a Claude Code hook. Nothing inspects what any of these apps does, and each
-    row says it.
+    The T0 guard is a Claude Code hook. Nothing inspects what any of these apps does, and every
+    row says so. It matters most on an assistant row: an unguarded agent that reads your
+    originals and can send from them is the shape the whole doctrine is about.
   </Accordion>
 </AccordionGroup>
 
 An app that runs several helper processes from bundles nested inside its own — as Electron
 apps do — is one row, not six. The outermost `.app` is what counts.
+
+## Why the sandbox reads backwards
+
+Entitlements are sandbox permits. That makes them exactly the wrong measure of reach for an app
+that has no sandbox.
+
+`com.apple.security.network.client` is how a **sandboxed** app asks for the network. An app
+outside the sandbox needs no permit at all: it declares nothing and has unrestricted network,
+plus every file your account can reach that TCC does not cover — `$HOME/.ssh`, `$HOME/.config`,
+every repository on the disk.
+
+Reading that absence as "no network" got the answer backwards. It meant the §3 N2 pairing —
+reads an original store **and** can send — went unreported on the rows that had it, while being
+reported faithfully for sandboxed apps that reach less.
+
+The roster reads `com.apple.security.app-sandbox` first now. When it is missing, network and
+files are recorded as **granted** rather than left blank, and the cell carries the reason:
+
+> no app-sandbox entitlement, so outbound network needs no permit and nothing gates it
+
+<Warning>
+  **An absence is not always a smaller claim.** On these rows a TCC-gated entitlement still
+  means *declared* — what the app may ask macOS for, not what macOS allowed. The sandbox is the
+  exception and runs the other way: not declaring it means more reach, not less. The capability
+  tags show granted apart from declared so the difference is visible where it matters.
+</Warning>
 
 ## Whose thing each row is
 
@@ -172,16 +232,28 @@ It also catches what a file deny list cannot. A connector that reaches a T0 stor
 
 ## Checking it
 
-`scripts/check-roster.py` builds a home directory to order and asserts each cell and each finding — 44 checks.
+`scripts/check-roster.py` builds a home directory to order and asserts each cell and each finding — 57 checks.
 
 ```bash
 python3 scripts/check-roster.py
 ```
 
+The classification is checked against bundles the test builds and signs itself, rather than
+against whatever this Mac happens to have installed. A fixture needs a real Mach-O executable:
+a bundle whose executable is a shell script signs as "bundle with generic" and silently carries
+no entitlements at all.
+
 Headless, the roster prints to a shell:
 
 ```bash
 dist/Mockingbyrd.app/Contents/MacOS/Mockingbyrd --roster
+```
+
+To ask about a single bundle — including one that is not running — and see the sentence the
+verdict was read from:
+
+```bash
+dist/Mockingbyrd.app/Contents/MacOS/Mockingbyrd --classify-app /Applications/Some.app
 ```
 
 <Card title="Back to architecture" icon="sitemap" horizontal href="/mockingbird/architecture">

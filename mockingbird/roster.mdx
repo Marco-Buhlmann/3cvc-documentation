@@ -76,13 +76,21 @@ The roster used to recognise four process names — Claude, Codex, ChatGPT, Curs
 app called anything else was invisible however much it could reach. A tool running right now,
 declaring access to your contacts, calendars, photos and reminders, appeared nowhere.
 
-Every running app outside `/System` is read now, and one gets a row when its code signature
-declares an **original store or the keychain**. The test is reach, not vendor: the question
+Every running app outside `/System` is read now, and one gets a row — in the panel under the
+map, in the matrix, and in Intuitive mode's summary card — when its code signature declares an
+**original store or the keychain**. The test is reach, not vendor: the question
 this page answers is what can get at your things, and an app saying so in its own signature is
 as good a source as a config file.
 
 Sensors alone are not enough. Location and the camera are declared by half the Mac, and a row
 for each would bury the rows that matter.
+
+<Tip>
+  The list is usually more surprising than expected, and rarely in the direction people brace
+  for. On a typical Mac the widest declared reach belongs to office and PDF software — files,
+  network, contacts, calendars, keychain and Apple Events, which is the read-and-send pairing
+  §3 N2 exists to prevent — rather than to anything with "AI" in its name.
+</Tip>
 
 <Note>
   These rows are **declared, never granted** — the same state entitlements get everywhere else
@@ -97,10 +105,16 @@ Three things keep them from being mistaken for agents:
     agent and not a plug-in, and folding it into either number would overstate that number.
   </Accordion>
 
-  <Accordion title="Kept off the map">
-    The map is about agents and the wires between them. Seventeen cards with no wires would
-    bury the two that have them, so apps appear in the matrix and in one summary card in
-    Intuitive mode rather than on the diagram.
+  <Accordion title="Kept off the map, but not out of sight">
+    The map is about agents and the wires between them, and a dozen or more cards with no
+    wires would bury the two that have them. So apps are not drawn on the diagram — they get
+    their own panel beneath it, sorted by how far each signature says the app reaches, with
+    the capability tags on every row. They also appear in the matrix, and in Intuitive mode as
+    a single card naming them all.
+
+    The first version of this counted them in the hub and showed them nowhere, which made a
+    working feature look broken: the diagram said "17 apps" and offered no way to see which
+    seventeen.
   </Accordion>
 
   <Accordion title="Unguarded, and said so">

@@ -1,0 +1,263 @@
+---
+title: "The doctrine"
+description: "Never Touch The Original — the operating doctrine Mockingbyrd measures against, in full."
+icon: "scroll"
+---
+
+An implementation strategy for running AI agents across many gigabytes of irreplaceable personal capture, message, and financial data — without ever granting one a writable handle to any of it.
+
+<Note>
+  This is the doctrine every §-numbered reference in the app points at, and the same
+  text the app ships as a PDF under **Doctrine → Read the doctrine**. It is written for
+  one operator on one Mac; the figures in §0 are the ones Mockingbyrd measures for you.
+</Note>
+
+## §0 · Current posture
+
+**Measure these on your own machine.**
+
+Mockingbyrd measures each of these on your own machine:
+
+- Permission rules in allow list
+- Rules in deny list
+- Rules in ask list
+- Screenpipe db.sqlite · live wal attached
+- Imessage chat.db
+- Capture files in ~/.screenpipe/data
+
+> Every rule you hold today is a permission to act. Nothing on this machine currently expresses a permission to refrain. That asymmetry — not any single grant — is the finding.
+
+## §1 · Threat model
+
+**What you are actually defending against.**
+
+Not an attacker with a shell on your Mac. If that happens, none of this matters. The realistic failure mode for personal agent use is narrower and much more likely: **an agent doing exactly what it was asked, to the wrong copy of something.** Five paths lead there.
+
+| VECTOR | HOW IT REACHES YOU SPECIFICALLY | LOSS IF IT LANDS |
+|---|---|---|
+| Silent mutation | An agent runs `sqlite3 ~/.screenpipe/db.sqlite` to answer a question. SQLite finds an unclean WAL, recovers it, and writes to a multi-gigabyte file that has no second copy. No prompt fires — you allowed `sqlite3:*`. | Irrecoverable. Years of capture. |
+| Injection via capture | screenpipe OCRs whatever is on screen; Beeper carries messages other people wrote. Both land in agent context as plain text. A crafted string in either is indistinguishable from your instruction. | Agent acts for someone else. |
+| The trifecta | One session holds bulk archive read and untrusted input and egress (`curl`, `ssh`, Gmail `send_message`, Beeper `send_message`). Exfiltration needs no exploit — only a convincing sentence. | Confidential documents, agreements, credentials. |
+| Unattended blast | A scheduled pipe runs on a fixed cycle, reading OCR text and writing to Reminders. Nobody is at the keyboard to decline anything. | Compounds silently for days. |
+| Subsumption | `Bash(python:*)`, `Bash(osascript *)` and `Bash(source:*)` are already allowed. Each is a general interpreter. Any rule you add is advisory while they stand. | All other controls void. |
+
+<Warning>
+  **Read this before writing any config** Three of your existing grants — `python:*`, `osascript *`, `source:*` — can execute arbitrary code, and `osascript` additionally drives Messages, Mail and Finder through AppleScript. A deny rule sitting beside them stops an honest agent, not a redirected one.
+</Warning>
+
+## §2 · Data tiers
+
+**Classify once, then let the tier decide.**
+
+The doctrine only becomes operational when “original” has an address. Sort every store on the machine into one of four tiers. The tier — never a judgment call in the moment — determines what an agent may hold.
+
+| TIER | CONTENTS | AGENT ACCESS | RATIONALE |
+|---|---|---|---|
+| T0 ORIGINAL | `~/.screenpipe/db.sqlite` multi-gigabyte · `~/.screenpipe/data/` tens of thousands of files · `~/Library/Messages/chat.db` hundreds of megabytes · `~/Library/Mail` · Photos Library · `~/.ssh` · Keychains · `*.env` · executed agreements, signed PDFs | NO PATH, EVER Not read-only. Absent. The agent is never told these paths exist. | No second copy exists, or the copy is the legal instrument. A single write is terminal. |
+| T1 REPLICATED | Gmail · Drive · Notion · Slack · Beeper server-side · Supabase · Cloudflare · git remotes | READ WRITE · SEND · DELETE | Recoverable, but outward-facing. A send is unrecallable even when the record survives. |
+| T2 PROJECTION | `~/agent/derived/` — read-only extracts built from T0 by a script you run. Mode 444, sha256-manifested. | READ No write | This is the agent’s window onto T0. Regenerable at will, so its loss costs nothing. |
+| T3 SCRATCH | `~/agent/work/` — git-tracked. Everything an agent produces lands here and nowhere else. | READ · WRITE | Disposable by construction. Version control turns every agent action into a reviewable diff. |
+
+**The only legal direction of travel**
+
+**T0 original** (originals — no path, ever) → *you run the extraction* → **T2 projection** (read-only projection, mode 444) → *agent reads* → **T3 scratch** (scratch, git-tracked)
+
+## §3 · Invariants N1–N7
+
+**Seven rules that do not bend.**
+
+Each states a prohibition and the mechanism that makes it true. A rule with no enforcement line is a preference, and preferences do not survive a busy afternoon.
+
+### N1 · Never open a T0 store with a writable handle.
+
+Reading a SQLite database is not a read. If the `db.sqlite-wal` is live, any normal open triggers WAL recovery and writes to the main file. The correct move is to clone the triplet first and let recovery happen on the clone.
+
+<Note>
+  **ENFORCED BY —** mode 444 + `chflags uchg` on originals; extraction script clones `db.sqlite`, `-wal` and `-shm` with `cp -c` before opening anything.
+</Note>
+
+### N2 · Never combine bulk archive read with outbound capability in one session.
+
+Split into two profiles that cannot be loaded together. Analyst reads T2, has no network and no send tools. Operator holds `curl`, Gmail, Slack, Beeper, Supabase — and has no path into `~/agent/derived/`.
+
+<Note>
+  **ENFORCED BY —** two settings files selected at launch; `additionalDirectories` scoped per profile.
+</Note>
+
+### N3 · Never let the agent be the thing that applies a change to T0 or T1.
+
+The agent’s output is a proposal: a diff, a migration file, a draft, a shell script. You run it. This costs one command and converts every irreversible act into a reviewable artifact.
+
+<Note>
+  **ENFORCED BY —** everything lands in `~/agent/work/` under git; a promote script is the only path outward, and only you invoke it.
+</Note>
+
+### N4 · Never treat ingested content as instruction.
+
+OCR text, message bodies, email, PDFs, web pages and tool results are data. If any of them addresses the agent, that string gets quoted back to you, not obeyed. Standing text in `CLAUDE.md` should say so in those words.
+
+<Note>
+  **ENFORCED BY —** quarterly canary drill (§4 P5); a planted instruction must come back reported, not executed.
+</Note>
+
+### N5 · Never keep a grant that subsumes the deny list.
+
+Drop `Bash(python:*)`, `Bash(osascript *)`, `Bash(source:*)` and `Bash(sqlite3:*)` from the allow list. Re-add the four or five specific invocations you actually use, spelled out in full. If a broad grant must stay, accept that permissions are advisory and rely on N1’s filesystem controls.
+
+<Note>
+  **ENFORCED BY —** the PreToolUse guard in §4 P4, which inspects the command string regardless of which interpreter is running it.
+</Note>
+
+### N6 · Never delegate deletion.
+
+No agent path contains `rm`, `trash_message`, `trash_file`, `DELETE FROM`, `DROP`, or `git push --force`. Deletion is the one act with no diff to review afterward, which makes it the one act that stays yours.
+
+<Note>
+  **ENFORCED BY —** deny entries plus a guard-script pattern match; trash tools removed from both profiles.
+</Note>
+
+A scheduled pipe consumes untrusted OCR with nobody watching. Scheduled agents get the narrowest profile on the machine: one read source, one write target, no network, no shell.
+
+## §4 · Rollout phase 0–5
+
+**Implementation, in the order that de-risks fastest.**
+
+Phase 0 is an hour and removes most of the exposure. Do not let phases 2–4 block it.
+
+### P0 · Freeze the blast radius
+
+*~1 HOUR · TODAY*
+
+- Add a deny and an ask block to `~/.claude/settings.json` — both are empty today.
+- Strip the four subsuming grants from `settings.local.json`, and `tccutil reset` with them; nothing an agent does should be able to reset your macOS privacy grants.
+- Move `curl`, `ssh`, `rsync` from allow to ask. These are your egress.
+
+*~/.CLAUDE/SETTINGS.JSON — PERMISSIONS*
+
+```json
+"deny": [
+  "Read($HOME/.screenpipe/**)",
+  "Read($HOME/Library/Messages/**)",
+  "Read($HOME/Library/Mail/**)",
+  "Read($HOME/.ssh/**)",
+  "Read($HOME/**/.env*)",
+  "Bash(tccutil:*)",
+  "Bash(rm:*)",
+  "Bash(git push --force:*)"
+],
+"ask": [
+  "Bash(curl:*)", "Bash(ssh:*)", "Bash(rsync:*)", "Bash(scp:*)",
+  "WebFetch"
+]
+```
+
+### P1 · Seal the originals
+
+*~1 EVENING*
+
+- Set the immutable flag on anything that should never change again — executed agreements, signed PDFs, key material. `uchg` blocks writes even from processes running as you.
+- Take an APFS local snapshot before each capture-heavy session, so a mistake has a floor.
+- Record a manifest of the sealed set, so drift is detectable rather than assumed absent.
+
+*SEAL — RUN ONCE, THEN AFTER EACH NEW EXECUTED DOCUMENT*
+
+```bash
+mkdir -p ~/agent/manifests
+
+# immutable flag: blocks writes from your own uid
+chflags uchg ~/Documents/Executed/*.pdf ~/.ssh/id_*
+
+# rollback floor, ~1s regardless of volume size
+tmutil localsnapshot
+
+# drift detection
+shasum -a 256 ~/Documents/Executed/*.pdf \
+  > ~/agent/manifests/executed.sha256
+# weekly: shasum -a 256 -c ~/agent/manifests/executed.sha256
+```
+
+### P2 · Build the projection pipeline
+
+*~HALF DAY*
+
+- Clone `db.sqlite` plus its `-wal` and `-shm` with `cp -c`. On APFS this is a copy-on-write clone: instant, and it consumes no additional space for a multi-gigabyte file until something diverges.
+- Let WAL recovery and `VACUUM` run against the clone. The original is never opened by a writer.
+- Ship the result at mode 444 with a checksum. That file, and only that file, is what an Analyst session sees.
+
+*~/AGENT/BIN/PROJECT-SCREENPIPE — YOU RUN THIS, NEVER THE AGENT*
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+SRC="$HOME/.screenpipe"
+DST="$HOME/agent/derived/screenpipe.ro.sqlite"
+STAGE=$(mktemp -d)
+trap 'rm -rf "$STAGE"' EXIT
+
+# APFS clone — O(1), no extra space, original untouched
+cp -c "$SRC/db.sqlite"     "$STAGE/"
+cp -c "$SRC/db.sqlite-wal" "$STAGE/" 2>/dev/null || true
+cp -c "$SRC/db.sqlite-shm" "$STAGE/" 2>/dev/null || true
+
+# recovery + checkpoint happen HERE, on the clone
+sqlite3 "$STAGE/db.sqlite" "PRAGMA wal_checkpoint(TRUNCATE);"
+
+# narrow the projection: drop what the task doesn't need
+sqlite3 "$STAGE/db.sqlite" "VACUUM INTO '$DST.tmp';"
+mv "$DST.tmp" "$DST"
+chmod 444 "$DST"
+shasum -a 256 "$DST" > "$DST.sha256"
+echo "projection ready: $(du -h "$DST" | cut -f1)"
+```
+
+### P3 · Split the profiles
+
+*~HALF DAY*
+
+### P4 · Enforce below the config layer
+
+*~HALF DAY*
+
+- A PreToolUse hook inspects every command string for T0 paths and destructive verbs, and blocks on match — independent of which interpreter would have run it. This is what survives N5’s escape hatches.
+- The same hook appends to a log you can actually read on a Sunday.
+- If you already run a PreToolUse hook, this chains beside it.
+
+*~/.CLAUDE/HOOKS/T0-GUARD — EXIT 2 BLOCKS THE CALL*
+
+```bash
+#!/usr/bin/env bash
+payload=$(cat)
+LOG="$HOME/agent/audit/tools.jsonl"
+mkdir -p "$(dirname "$LOG")"
+printf '%s\t%s\n' "$(date -u +%FT%TZ)" "$payload" >> "$LOG"
+
+T0='\.screenpipe/|Library/Messages/|Library/Mail/|\.ssh/'
+T0+='|Library/Keychains/|Photos Library|Executed/'
+DESTRUCTIVE='\brm +-[rf]|DELETE FROM|DROP TABLE|--force|tccutil reset'
+
+if grep -Eqi "$T0" <<<"$payload"; then
+  echo "BLOCKED: T0 original. Use ~/agent/derived/ instead." >&2
+  exit 2
+fi
+if grep -Eqi "$DESTRUCTIVE" <<<"$payload"; then
+  echo "BLOCKED: destructive verb. Deletion is not delegated." >&2
+  exit 2
+fi
+exit 0
+```
+
+## §5 · Limits
+
+**What this does not buy you.**
+
+Stated plainly, because a control you overrate is worse than one you don’t have.
+
+**It is not a security boundary against a determined chain.** An agent running as your uid with a general interpreter can reach anything your uid can reach. The controls here raise the number of independent steps a mistake must take, and make every one of them visible. That is a real reduction in expected loss. It is not isolation.
+
+If you want an actual boundary, the next step is a second POSIX user that owns `~/agent/` and has no read access to your home directory, or a VM. Everything above is compatible with that move and makes it cheaper later.
+
+**Context still leaves the machine.** Anything an agent reads is sent to a model provider. Projection narrowing in P2 is the only control that touches this, and it is the reason to take it seriously rather than shipping the whole multi-gigabyte view.
+
+**Assumptions** — Single operator, single Mac, no shared accounts. Figures in §0 are measured on your own machine from `~/.claude/settings*.json`, `~/.screenpipe` and `~/Library/Messages`. Permission-rule and hook syntax must be verified against your installed version before being relied on — both are noted inline. Paths assume the default home layout.
+
+**Open decisions for you** — Whether the Operator profile keeps `osascript` at all · which screenpipe app names to exclude from the projection · whether a scheduled pipe moves to the narrow profile now or after P3 · whether a second POSIX user is worth the friction this quarter.

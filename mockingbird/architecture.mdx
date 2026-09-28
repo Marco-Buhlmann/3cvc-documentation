@@ -4,11 +4,14 @@ description: "How a scan runs, how scoring and drift detection work, and how to 
 icon: "sitemap"
 ---
 
-Mockingbyrd is a single SwiftPM executable target, packaged into an `.app` bundle by `scripts/build-app.sh`. It has no dependencies and no `.xcodeproj`. One request leaves the app — the update check in `Engine/UpdateCheck.swift`, a GET for a static file, off in one click.
+Mockingbyrd is a single SwiftPM executable target, packaged into an `.app` bundle by `scripts/build-app.sh`. It has one dependency — sentry-cocoa, pinned in `Package.resolved` and linked statically — and no `.xcodeproj`.
+
+Two requests can leave the app, and both are yours to switch off. The update check in `Engine/UpdateCheck.swift` is a GET for a static file. Crash reporting in `Engine/CrashReports.swift` is **off by default and not merely quiet**: the SDK is never started until you turn it on.
 
 ```
 Entry.swift            argv switch — --scan / --context / --emit-fixes / --projection-script /
-                       --ledger / --roster / --classify-app / --price-routine /
+                       --ledger / --roster / --classify-app / --test-crash-report /
+                       --price-routine /
                        --explain-blocks / --restore-pack / --help,
                        else MockingbyrdApp.main()
   │
@@ -34,7 +37,8 @@ Entry.swift            argv switch — --scan / --context / --emit-fixes / --pro
   │     Approval.swift         the confirmation gate in front of anything that writes
   │     Context.swift          the allow-listed projection a copilot may see
   │     Integrity.swift         whether this copy is the published build
-  │     UpdateCheck.swift       the one request that leaves: version in, link out
+  │     UpdateCheck.swift       one request that leaves: version in, link out
+  │     CrashReports.swift      the other, off until you ask: what a report may carry
   │
   ├── Design/          Theme.swift — every hex in the app, one token each
   │                    Components.swift — the shared primitives

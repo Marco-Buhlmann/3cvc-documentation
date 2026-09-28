@@ -13,7 +13,7 @@ Mockingbyrd is a native macOS app. It checks your Mac against an operating doctr
 It ships with one doctrine, **[Never Touch The Original](/mockingbird/doctrine)**. Every rule is a shell probe you can edit, so the score follows whatever rule pack you load.
 
 <Note>
-  Everything Mockingbyrd measures stays on your Mac, stored as plain JSON you can read. It makes exactly one request of its own — an update check, which fetches a static file from the download site to compare version numbers and can be switched off in Settings. It carries no identifier, and nothing it measures is ever sent anywhere.
+  Everything Mockingbyrd measures stays on your Mac, stored as plain JSON you can read, and nothing it measures is ever sent anywhere. Two requests can leave, both switchable off in Settings. The **update check** fetches a static file from the download site to compare version numbers and carries no identifier. **Crash reporting** is off by default — not started, not sampled, not pinged — and sends a stack trace only once you turn it on.
 </Note>
 
 ## What it does
@@ -169,7 +169,40 @@ The licences it uses are signed with the real key, so a break in the signing too
 
 Mockingbyrd asks the download site once per launch whether a newer build exists.
 
-That request is a GET for a static JSON file. It carries no licence, no machine code, no version and no identifier of any kind, and it downloads and installs nothing — it compares two version numbers and offers a link. It is a switch in **Settings**, and turning it off makes the app silent on the network again.
+That request is a GET for a static JSON file. It carries no licence, no machine code, no version and no identifier of any kind, and it downloads and installs nothing — it compares two version numbers and offers a link. It is a switch in **Settings**, and turning it off makes the app silent on the network again — unless you have also turned on the other one.
+
+## Crash reporting
+
+A signed build that falls over on somebody else's Mac leaves nothing behind to read. Mockingbyrd can report a crash to Sentry so it can be fixed, and this is the one part of the app that sends anything about what happened on your machine — so it is **off, and off means not started**.
+
+<Warning>
+  Nothing is sent, sampled, queued or pinged until you turn this on yourself. The SDK is not
+  initialised on a Mac that has not opted in: there is no anonymous heartbeat, and no session is
+  opened. An older preferences file, written before the switch existed, reads as off — silence
+  is not consent.
+</Warning>
+
+Once it is on, a report carries the error and its stack trace, this build's version and commit, your macOS and hardware version, and basic performance timings.
+
+**What it does not carry, and why that took verifying:**
+
+| Removed | Why |
+|---|---|
+| Installation UUID | The SDK attaches one as the "user" even with PII disabled. It is stable, so two reports could be tied to one machine. |
+| `device_app_hash` | The same property wearing different clothes, in the app context. |
+| Home directory paths | A macOS stack trace is full of them, and a home directory is somebody's name. Every frame, message, breadcrumb and module path is rewritten to `$HOME`. |
+| Screenshots, view hierarchy | Not captured. The macOS SDK has no such feature, which is one fewer thing to promise. |
+| File contents, licence, machine code | Never collected. |
+
+The first two were found by sending a real error and reading what arrived, not by reading the SDK's documentation — both were present despite `sendDefaultPii` being off.
+
+<Note>
+  **One thing cannot be removed from the app side.** Sentry sees the address a report arrives
+  from, as any web request does, and derives an approximate country from it. Switching that off
+  is an organisation setting in Sentry — *Security & Privacy → Prevent Storing of IP
+  Addresses* — not something the SDK controls. The switch in Settings says so rather than
+  claiming more privacy than the app delivers.
+</Note>
 
 ## The eight screens
 
@@ -205,7 +238,7 @@ Grouped in the sidebar as **Posture**, **Control** and **Spend**.
   </Card>
 
   <Card title="Settings" icon="sliders">
-    Interface mode, scan cadence, what happens when the guard refuses something, the projection scope and the rule pack — plus your licence, the update check, and a way to reopen the tour.
+    Interface mode, scan cadence, what happens when the guard refuses something, the projection scope and the rule pack — plus your licence, the update check, crash reporting, and a way to reopen the tour.
   </Card>
 </CardGroup>
 

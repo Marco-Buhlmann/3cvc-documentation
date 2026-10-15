@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "maple",
-  "name": "3C Build",
+  "name": "3C BUILD",
   "colors": {
     "primary": "#1e1e1e",
     "light": "#BEFCC2",
@@ -96,7 +96,7 @@
       "format": "woff2"
     }
   },
-  "description": "3C Build is where 3CVC turns ideas into technology companies, building new ventures from the ground up.",
+  "description": "3C BUILD is where 3CVC turns ideas into technology companies, building new ventures from the ground up.",
   "styling": {
     "codeblocks": "dark"
   },

@@ -115,11 +115,5 @@
   "appearance": {
     "default": "dark",
     "strict": true
-  },
-  "fonts": {
-    "heading": {
-      "family": "Poppins",
-      "weight": 400
-    }
   }
 }

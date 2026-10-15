@@ -69,9 +69,9 @@
     ]
   },
   "logo": {
-    "light": "/images/3cvc.png",
-    "dark": "/images/3CVCcopy2.png",
-    "href": "https://3cubed.vc"
+    "light": "/images/3C_Build.png",
+    "dark": "/images/3C_Build.png",
+    "href": "https://3cbuild.3cubed.vc"
   },
   "navbar": {
     "primary": {

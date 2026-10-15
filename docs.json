@@ -89,9 +89,6 @@
   "icons": {
     "library": "fontawesome"
   },
-  "fonts": {
-    "family": "Open Sans"
-  },
   "description": "3C Build is where 3CVC turns ideas into technology companies, building new ventures from the ground up.",
   "styling": {
     "codeblocks": "dark"

@@ -115,5 +115,9 @@
       "light": "#000000",
       "dark": "#000000"
     }
+  },
+  "appearance": {
+    "default": "dark",
+    "strict": true
   }
 }

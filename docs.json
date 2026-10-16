@@ -76,7 +76,7 @@
   "navbar": {
     "primary": {
       "type": "button",
-      "label": "Dashboard",
+      "label": "3CUBED.VC",
       "href": "https://3cubed.vc"
     }
   },
@@ -88,13 +88,6 @@
   },
   "icons": {
     "library": "fontawesome"
-  },
-  "fonts": {
-    "heading": {
-      "family": "Good Times",
-      "source": "/fonts/good-times.woff2",
-      "format": "woff2"
-    }
   },
   "description": "3C BUILD is where 3CVC turns ideas into technology companies, building new ventures from the ground up.",
   "styling": {

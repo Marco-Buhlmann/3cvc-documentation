@@ -124,5 +124,10 @@
   },
   "interaction": {
     "drilldown": true
+  },
+  "fonts": {
+    "heading": {
+      "family": "Good Times"
+    }
   }
 }

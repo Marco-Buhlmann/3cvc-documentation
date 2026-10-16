@@ -124,5 +124,8 @@
   },
   "interaction": {
     "drilldown": true
+  },
+  "fonts": {
+    "family": "Good Times"
   }
 }

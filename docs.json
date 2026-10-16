@@ -8,8 +8,8 @@
     "dark": "#befcc2"
   },
   "favicon": {
-    "light": "/images/3cvc.png",
-    "dark": "/images/3cvc.png"
+    "light": "/images/favicon_lm.png",
+    "dark": "/images/favicon_dm.png"
   },
   "navigation": {
     "groups": [

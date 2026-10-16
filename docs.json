@@ -78,7 +78,13 @@
       "type": "button",
       "label": "3CUBED.VC",
       "href": "https://3cubed.vc"
-    }
+    },
+    "links": [
+      {
+        "href": "https://3cbuild.3cubed.vc",
+        "label": "3C BUILD"
+      }
+    ]
   },
   "footer": {
     "socials": {

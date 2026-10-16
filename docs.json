@@ -121,5 +121,8 @@
   "appearance": {
     "default": "dark",
     "strict": true
+  },
+  "interaction": {
+    "drilldown": true
   }
 }
